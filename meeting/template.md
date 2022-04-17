@@ -3,16 +3,16 @@
 * 时间：YYYY-MM-DD HH:MM+08
 
 * 参会人员：
-- *Member1*
-- *Member2*
-- ...
+  - *Member1*
+  - *Member2*
+  - ...
 
 * 会议记录员： *recorder*
 
 * 目标：
-1. *Object1*
-2. *Object1*
-3. ...
+  1. *Object1*
+  2. *Object1*
+  3. ...
 
 ## 会议内容
 
