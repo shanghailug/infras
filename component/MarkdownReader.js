@@ -965,7 +965,7 @@ template.innerHTML = String.raw`
   <article class="markdown-body"></article>
 </main>
 `;
-import { loadScript } from '/js/Util.js';
+import { loadScript } from './js/Util.js';
 
 export default class MarkdownReader extends HTMLElement {
   constructor() {
