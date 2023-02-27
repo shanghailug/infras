@@ -1,0 +1,23 @@
+#+title: SHLUG线上闲聊主机证书更新方案（草稿）
+
+* 现状
++ 通过IP地址的方式提供服务，证书已过期（ZeroSSL），目前已不能访问
++ 目前的jitsi主机域名已由 jitsi.shlug.org 改为 jitsi-main.shlug.org
++ jitsi.shlug.org改为动态域名
+* 方案
++ 使用域名 jitsi.shlug.org 提供服务，但使用非标端口
++ 证书使用 let's encrypt
++ 使用境外主机 jitsi-test.shlug.org 来获取或更新证书（HTTP-01）
+  1. 判断是否需要更新证书
+  2. 通过脚本，将 jitsi.shlug.org 域名指向 jitsi-test.shlug.org，并等待新的记录生效（TTL是60s）
+  3. 使用certbot或其他方式更新证书
+  4. 通过脚本，将 jitsi.shlug.org 域名恢复为指向 jitsi-main.shlug.org
+  5. 将更新的证书复制到特定目录，并设置为合适的权限及GID
++ 主机 jitsi-main.shlug.org 周期性通过ssh，同步证书
+  - jitsi-test.shlug.org创建专门的用户
+  - 同步发现新的证书后，更新到k3s
+* 已完成部分
+- 动态域名切换的脚本
+  + 通过ddclient实现，在 azureuser 用户的 ~/dns 目录下
+  + ~/dns/dns_move.sh 实现临时域名转移
+  + ~/dns/dns_restore.sh 实现域名恢复
