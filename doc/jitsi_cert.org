@@ -21,3 +21,4 @@
   + 通过ddclient实现，在 azureuser 用户的 ~/dns 目录下
   + ~/dns/dns_move.sh 实现临时域名转移
   + ~/dns/dns_restore.sh 实现域名恢复
+  + 注意，由于需要访问google domains的服务，这些脚本在 jitsi-main.shlug.org 不能工作
