@@ -18,7 +18,74 @@
   - 同步发现新的证书后，更新到k3s
 * 已完成部分
 - 动态域名切换的脚本
-  + 通过ddclient实现，在 azureuser 用户的 ~/dns 目录下
+  + 通过ddclient实现，在 root 用户的 ~/dns 目录下
   + ~/dns/dns_move.sh 实现临时域名转移
   + ~/dns/dns_restore.sh 实现域名恢复
   + 注意，由于需要访问google domains的服务，这些脚本在 jitsi-main.shlug.org 不能工作
+- 手动更新脚本
+  + 增加 traefix 规则，将jitsi.shlug.org域名80端口的访问，重定向到50080端口
+    #+begin_src yaml
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-certbot
+subsets:
+  - addresses:
+      - ip: xx.xx.xx.xx
+    ports:
+      - name: http
+        port: 50080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-certbot
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 50080
+    #+begin_src yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: web-certbot
+spec:
+  entryPoints:
+  - web
+  routes:
+  - kind: Rule
+    match: Host(`jitsi.shlug.org`)
+    # high priority
+    priority: 100
+    services:
+    - kind: Service
+      name: external-certbot
+      port: http
+    #+end_src
+  + 通过容器运行certbot
+    - 将内部80端口映射到外部50080端口
+    - standalone模式
+    - HTTP-01验证
+    - ~/dns/etc -> /etc/letsencrypt
+    - ~/dns/lib -> /var/lib/letsencrypt
+  + 脚本 ~/dns/reg.sh
+    #+begin_src sh
+    podman run -it --rm \
+               -v /root/dns/etc:/etc/letsencrypt:rw \
+               -v /root/dns/lib:/var/lib/letsencrypt:rw \
+               certbot/certbot \
+               register
+    #+end_src
+  + 脚本 ~/dns/renew.sh
+    #+begin_src sh
+    podman run -it --rm \
+               -p 50080:80 \
+               -v /root/dns/etc:/etc/letsencrypt:rw \
+               -v /root/dns/lib:/var/lib/letsencrypt:rw \
+               certbot/certbot \
+               certonly \
+               --standalone \
+               -d jitsi.shlug.org
+    #+end_src
