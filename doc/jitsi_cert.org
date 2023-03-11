@@ -24,6 +24,7 @@
   + 注意，由于需要访问google domains的服务，这些脚本在 jitsi-main.shlug.org 不能工作
 - 手动更新脚本
   + 增加 traefix 规则，将jitsi.shlug.org域名80端口的访问，重定向到50080端口
+    - certbot.yaml
     #+begin_src yaml
 ---
 apiVersion: v1
@@ -46,6 +47,8 @@ spec:
     - name: http
       protocol: TCP
       port: 50080
+    #+end_src
+    - web_to_certbot.yaml
     #+begin_src yaml
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
